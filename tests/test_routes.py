@@ -20,3 +20,8 @@ def test_health_check(client):
 def test_health_check_invalid_method(client):
     response = client.post('/health')
     assert response.status_code == 405
+
+def test_html_template_rendering(client):
+    response = client.get('/')
+    assert response.status_code == 200
+    assert b"<h1>Hello, Cortex!</h1>" in response.data

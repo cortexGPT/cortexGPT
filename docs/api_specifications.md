@@ -1,142 +1,128 @@
+# **API Specifications**
 
-# **API Specifications - Cortex v0.0.0.1**
+This document outlines the API endpoints for Cortex **v0.0.0.2**, detailing request/response structures, data formats, and error handling. This version introduces the foundational routes with basic response handling for testing the Flask application.
 
 ---
 
-## **Version Overview**
-This version of Cortex focuses on setting up the basic project infrastructure. The API at this stage is minimal, providing basic interaction endpoints for a future Flask-based backend. Below is a detailed specification for the endpoints and expected behaviors.
+## **Table of Contents**
+1. [Overview](#overview)
+2. [Endpoints](#endpoints)
+   - [Root Route `/`](#root-route-)
+   - [Health Check Route `/health`](#health-check-route-health)
+3. [Request and Response Formats](#request-and-response-formats)
+4. [Error Handling](#error-handling)
+5. [Future Additions](#future-additions)
 
-### **Base URL**
-The API will be hosted locally during development. The base URL for all endpoints is:
+---
 
-```
-http://localhost:5000/
-```
+## **Overview**
+
+The initial version of the Cortex API is designed to:
+1. Provide a basic web page with the root route (`/`).
+2. Offer a health check endpoint (`/health`) to verify server status.
+
+The Flask application processes HTTP GET requests for both routes, utilizing HTML templating for the root and JSON response for health checks.
 
 ---
 
 ## **Endpoints**
 
-### **1. `/` (GET)**
-- **Description**: This endpoint serves as a health check to ensure the server is running.
-- **Method**: `GET`
-- **Response**:
-  - **Status**: `200 OK`
-  - **Body**:
-    ```json
-    {
-      "status": "Server is running"
-    }
-    ```
-- **Error Handling**:
-  - **500 Internal Server Error**: If the server encounters an issue while responding.
+### **Root Route `/`**
 
----
+- **Description**: Serves the home page as an HTML document.
+- **Endpoint**: `/`
+- **HTTP Method**: `GET`
+- **Response**: Renders the `index.html` template, which displays a welcome message.
+- **Example Request**:
+  ```http
+  GET / HTTP/1.1
+  Host: localhost:5000
+  ```
+- **Example Response**:
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Welcome to Cortex</title>
+  </head>
+  <body>
+      <h1>Hello, Cortex!</h1>
+      <p>This is the landing page for Cortex v0.0.0.2.</p>
+  </body>
+  </html>
+  ```
 
-### **2. `/echo` (POST)**
-- **Description**: This endpoint echoes the data sent by the client, demonstrating basic request handling. In the future, this will serve as a foundation for more complex processing.
-- **Method**: `POST`
-- **Request**:
-  - **Body (JSON)**:
-    ```json
-    {
-      "message": "string"
-    }
-    ```
-  - Example:
-    ```json
-    {
-      "message": "Hello Cortex"
-    }
-    ```
-- **Response**:
-  - **Status**: `200 OK`
-  - **Body (JSON)**:
-    ```json
-    {
-      "echo": "Hello Cortex"
-    }
-    ```
-- **Error Handling**:
-  - **400 Bad Request**: If the request body is invalid or missing.
-    - **Response**:
-      ```json
-      {
-        "error": "Invalid input"
-      }
-      ```
-  - **500 Internal Server Error**: If the server encounters an issue while processing the request.
+### **Health Check Route `/health`**
 
----
-
-## **Error Handling Strategy**
-
-All API responses will follow a standard format for errors to ensure consistent feedback to the client. The following error responses are supported:
-
-### **1. 400 Bad Request**
-- **Description**: The client has sent a malformed request.
-- **Example**:
-  - **Request**:
-    ```json
-    {
-      "msg": "Hello"
-    }
-    ```
-  - **Response**:
-    ```json
-    {
-      "error": "Invalid input"
-    }
-    ```
-
-### **2. 500 Internal Server Error**
-- **Description**: A server error occurred. This could be due to various internal issues.
-- **Response**:
+- **Description**: Provides server status, confirming the backend is running.
+- **Endpoint**: `/health`
+- **HTTP Method**: `GET`
+- **Response**: JSON response with server status information.
+- **Example Request**:
+  ```http
+  GET /health HTTP/1.1
+  Host: localhost:5000
+  ```
+- **Example Response**:
   ```json
   {
-    "error": "Server encountered an issue"
+      "status": "running"
   }
   ```
 
 ---
 
-## **Input/Output Formats**
+## **Request and Response Formats**
 
-### **Input Format**
-- All API endpoints expect input data to be in **JSON** format. Invalid or missing JSON will result in a `400 Bad Request` error.
-- For `POST` requests, ensure the correct `Content-Type` header is set:
-  ```
-  Content-Type: application/json
-  ```
-
-### **Output Format**
-- All responses from the API will be returned in **JSON** format with the following headers:
-  ```
-  Content-Type: application/json
-  ```
+1. **Request Formats**:
+   - Both endpoints accept standard HTTP GET requests.
+   - `/` route returns an HTML document.
+   - `/health` route returns a JSON response.
+   
+2. **Response Formats**:
+   - `/` route renders HTML via Flask’s `render_template()` function.
+   - `/health` route uses Flask’s `jsonify()` to return JSON.
 
 ---
 
-## **Known Issues**
-- The current version has limited error handling and does not yet implement security measures such as rate limiting or input validation beyond simple checks.
+## **Error Handling**
+
+### **1. Unsupported Methods**
+   - Routes `/` and `/health` only support the `GET` method.
+   - **Error Response**:
+     - **Status Code**: `405 Method Not Allowed`
+     - **Response Body**:
+       ```json
+       {
+           "error": "Method Not Allowed"
+       }
+       ```
+
+### **2. Template Not Found**
+   - If the `index.html` template is missing or misconfigured, the server will respond with an error.
+   - **Error Response**:
+     - **Status Code**: `500 Internal Server Error`
+     - **Response Body** (Default Flask error message):
+       ```html
+       <!DOCTYPE html>
+       <html lang="en">
+       <head>...</head>
+       <body>
+           <h1>Internal Server Error</h1>
+           <p>The server encountered an internal error and could not complete your request.</p>
+       </body>
+       </html>
+       ```
+
+### **3. General Error Handling**
+   - All unhandled errors will return a `500 Internal Server Error` status code, indicating that an internal issue has occurred.
 
 ---
 
-## **Future Enhancements**
-As the project evolves, the following improvements are planned for the API:
-- **Input Validation**: Add stricter validation for incoming requests using validation libraries.
-- **Authorization**: Implement token-based authentication.
-- **Session Handling**: Add support for user sessions and contextual data.
-- **Error Reporting**: Provide more detailed error messages with stack traces during development.
+## **Future Additions**
 
----
-
-This document will be updated in future revisions as new features are added and existing functionality is improved.
-
----
-
-### Next Steps:
-1. **Implement `/api/data` endpoint**: For handling more complex POST requests.
-2. **Integrate Flask-RESTful**: For better endpoint management and routing.
-
----
+Future versions will introduce:
+1. **Input Validation**: Validation rules for new routes and forms to ensure data integrity.
+2. **Authentication**: Secure access for restricted endpoints.
+3. **Error Page Customization**: Define custom templates for error codes (404, 500) to improve user experience.

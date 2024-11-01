@@ -1,206 +1,173 @@
-# **Technical Documentation - Cortex v0.0.0.1**
+# **Technical Documentation for Cortex**
+
+## **Overview**
+
+This document provides a technical overview of Cortex, including architectural details, module descriptions, endpoint specifications, error handling, and dependencies. Cortex is a web application built on Flask that serves as a foundational backend and front-end interface for further development.
 
 ---
 
-## **Table of Contents**
-1. [Introduction](#introduction)
-2. [Architecture Overview](#architecture-overview)
-3. [Module Descriptions](#module-descriptions)
-4. [System Flow Diagrams](#system-flow-diagrams)
-5. [Third-Party Dependencies](#third-party-dependencies)
-6. [Testing Strategy](#testing-strategy)
-7. [Versioning and Deployment](#versioning-and-deployment)
-8. [Future Enhancements](#future-enhancements)
+## **Architecture**
 
----
+### **System Architecture**
+Cortex’s architecture consists of a lightweight Flask backend, basic HTML front-end, and modular components for future scalability:
+- **Flask Backend**: Manages routing, HTTP handling, and API endpoint definitions.
+- **HTML Frontend**: Provides a simple, Jinja2-rendered HTML page as the user interface.
+- **Testing Framework**: Uses `pytest` for unit and integration testing of all routes and template rendering.
 
-## **1. Introduction**
-
-**Cortex v0.0.0.1** is the foundational release for the Cortex project, focusing on setting up the development environment, configuring repository management, and establishing code quality standards. This document covers the key technical aspects of this revision, from architecture and modules to dependencies and testing.
-
----
-
-## **2. Architecture Overview**
-
-Cortex adopts a modular structure to ensure scalability and maintainability. The current architecture is lightweight, focusing primarily on environment setup and repository configuration. In future versions, it will expand to include a Flask-based API, a UI layer, and advanced NLP features.
-
-### **High-Level Architecture:**
+### **File Structure**
+The Cortex file structure follows best practices for separation of concerns:
 ```plaintext
-+-----------------------------------+
-|           Cortex Backend          |
-|  +-----------------------------+  |
-|  |        Core Python Code      |  |
-|  |    +---------------------+   |  |
-|  |    |    Utility Modules   |   |  |
-|  |    +---------------------+   |  |
-|  +-----------------------------+  |
-+-----------------------------------+
+cortexGPT/
+├── /docs/                        # Documentation files, including API and technical details
+│   ├── api_specifications.md     # API details for each endpoint
+│   ├── technical_documentation.md # This file, covering system architecture and modules
+│   └── user_manual.md            # User guide with setup and usage instructions
+├── /src/
+│   ├── /app/
+│   │   └── app.py                # Main Flask application file with route definitions
+│   ├── /templates/
+│   │   └── index.html            # HTML template for the landing page
+├── /tests/                       # Unit and integration tests
+│   ├── test_environment.py       # Test to validate environment setup
+│   └── test_routes.py            # Tests for route functionality
+├── .pre-commit-config.yaml       # Configurations for pre-commit linting and formatting
+├── CHANGELOG.md                  # Records changes for each release version
+└── README.md                     # Setup and contribution instructions
 ```
 
-This structure represents the foundation, with `/src/` containing core logic and `/tests/` managing test cases. Future versions will add components like Flask, HTML interfaces, and NLU integration.
-
 ---
 
-## **3. Module Descriptions**
+## **Modules and Components**
 
-### **3.1 Development Environment Setup**
+### **1. Flask Application**
+- **Primary File**: `app.py` located in `/src/app/`
+- **Purpose**: Serves as the main application script for the Flask web server. Defines endpoints, serves the front-end template, and handles JSON responses.
+- **Interdependencies**:
+  - **HTML Templates**: Uses Jinja2 to render HTML for the `/` route.
+  - **Unit Tests**: Validated via `pytest` tests in `/tests/test_routes.py`.
+- **Key Functions**:
+  - **`home()`**: Renders the landing page template.
+  - **`health_check()`**: Returns a JSON object indicating server status.
 
-- **File**: `requirements.txt`
-- **Purpose**: This file tracks all dependencies required for the project. Developers install these dependencies via `pip`.
-- **Key Commands**:
-  ```bash
-  pip install -r requirements.txt
+### **2. Templates**
+- **Location**: `/src/templates/`
+- **Main Template**: `index.html`
+- **Purpose**: Provides the static content served by the root endpoint.
+- **Interdependencies**: Served by Flask’s `render_template` function within the `home()` route.
+- **Standards**:
+  - Structured using semantic HTML.
+  - Follows responsive design principles for cross-browser compatibility.
+
+### **3. Testing**
+- **Primary Directory**: `/tests/`
+- **Purpose**: Ensures that each route and endpoint behaves as expected.
+- **Framework**: `pytest` is used for automated testing.
+- **Key Tests**:
+  - **Home Route Test**: Confirms the HTML page is rendered successfully.
+  - **Health Check Route Test**: Validates JSON response for server status.
+- **Code Example**:
+  ```python
+  def test_home_route(client):
+      response = client.get('/')
+      assert response.status_code == 200
+      assert b"Hello, Cortex!" in response.data
   ```
 
-### **3.2 Git Repository**
+---
 
-- **File**: `.gitignore`
-- **Purpose**: Manages files and directories excluded from version control, such as `venv/` and cache files.
-- **Key Directories Excluded**:
-  - Virtual environments (`venv/`)
-  - Python cache files (`__pycache__`)
+## **Flow Diagrams**
 
-### **3.3 Directory Structure**
-
-The project adopts a clean and modular directory structure:
+### **Application Request Flow**
 
 ```plaintext
-/cortex_project/
-├── /src                # Core logic, utility modules
-├── /tests              # Unit and integration tests
-├── /docs               # Project documentation
-└── requirements.txt    # Dependency tracking
+[User Request]
+       |
+       v
+[Flask Server]
+       |
+       v
+  [Route Handler]
+       |
+       +--> [Template Rendering (home route)]
+       |         |
+       |         v
+       |    Rendered HTML Page
+       |
+       +--> [JSON Response (health_check)]
+       |
+       v
+ [Response to User]
 ```
 
-### **3.4 Linter and Formatter Tools**
-
-- **Tools**: `pylint`, `black`
-- **Purpose**: Enforce consistent code quality and formatting. Pre-commit hooks ensure linting and formatting checks before code is committed.
-- **Pre-commit Hook Configuration**: `.pre-commit-config.yaml`
-
----
-
-## **4. System Flow Diagrams**
-
-### **4.1 Dependency Installation Flow**
-
-```plaintext
-+---------------------------+
-| Start: Install Dependencies|
-+---------------------------+
-          |
-          V
-+---------------------------+
-| Check for requirements.txt |
-+---------------------------+
-          |
-          V
-+---------------------------+
-|   Install Dependencies     |
-|   Using system's pip       |
-+---------------------------+
-          |
-          V
-+---------------------------+
-|   Dependencies Installed   |
-+---------------------------+
-```
-
-### **4.2 Directory Structure Validation Flow**
-
-```plaintext
-+----------------------------+
-| Start: Validate Structure   |
-+----------------------------+
-          |
-          V
-+----------------------------+
-|  List Expected Directories  |
-+----------------------------+
-          |
-          V
-+----------------------------+
-|  Compare with Actual Files  |
-+----------------------------+
-          |
-          V
-+----------------------------+
-| Structure Matches?          |
-+--------+---------+----------+
-         |         |
-         V         V
-   +----------+    +------------+
-   |   Yes    |    |    No       |
-   +----------+    +------------+
-```
+### **File and Module Interaction Flow**
+- **Flask App** -> `render_template()` -> **HTML Template (`index.html`)**
+- **Flask App** -> `jsonify()` -> **JSON Response (`{"status": "running"}`)**
+- **Unit Tests** -> Flask Endpoints -> **Routes (`/`, `/health`)**
 
 ---
 
-## **5. Third-Party Dependencies**
+## **API Endpoints**
 
-### **Core Dependencies**
+| Endpoint | Method | Description                   | Response Format |
+|----------|--------|-------------------------------|-----------------|
+| `/`      | `GET`  | Renders the main HTML page    | HTML           |
+| `/health`| `GET`  | Provides server status        | JSON           |
 
-- **Python 3.8+**: Required for the project.
-- **pip**: Python package manager.
-
-### **Development Dependencies**
-
-- **pytest**: Unit testing framework.
-- **pylint**: Linting tool for Python.
-- **black**: Code formatter.
-  
-These tools are managed using `requirements.txt`, ensuring all developers have the same development environment.
+For detailed request/response structures and error handling, refer to **api_specifications.md**.
 
 ---
 
-## **6. Testing Strategy**
+## **Error Handling**
 
-### **Unit Tests**:
-- **Target**: Core functions like virtual environment setup and dependency installation.
-- **Example Test**: `/tests/test_environment.py`
-  
-### **Integration Tests**:
-- **Target**: Integration of modules, such as ensuring the directory structure and `.gitignore` function correctly.
+### **Error Scenarios**
+1. **Missing Template**: Returns a `500` error if the `index.html` file is missing.
+2. **Unsupported HTTP Methods**: Returns `405` if a non-`GET` request is sent to the `/` or `/health` endpoints.
 
-### **Manual Tests**:
-- Test environment setup and virtual environment activation across different platforms.
+### **Error Codes and Responses**
+| Status Code | Scenario                       | Response               |
+|-------------|--------------------------------|------------------------|
+| `500`       | Missing Template               | `Internal Server Error`|
+| `405`       | Unsupported HTTP Method        | `Method Not Allowed`   |
 
-Full details can be found in the [Testing Plan](154).
-
----
-
-## **7. Versioning and Deployment**
-
-### **Versioning**
-
-Cortex uses **Semantic Versioning**:
-- **Major**: Significant releases (e.g., new modules).
-- **Minor**: Small improvements or new features.
-- **Patch**: Bug fixes or minor changes.
-
-The current version is **v0.0.0.1**, establishing the project’s core.
-
-### **Deployment**
-
-Deployment is local for this version, following these steps:
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/cortexGPT/cortexGPT.git
-   cd cortexGPT
-   ```
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Run tests**:
-   ```bash
-   pytest
-   ```
+### **Logging and Debugging**
+- **Debug Mode**: Enabled by default in development, providing error tracebacks.
+- **Production**: Disable debug mode and configure error handling for production deployment.
 
 ---
 
-## **8. Future Enhancements**
+## **Third-Party Dependencies**
 
-- **v0.0.0.2**: Flask application bootstrapping, adding basic API endpoints.
-- **v0.0.0.3**: Basic HTML user interface integration with Flask.
-- **v0.0.0.4**: Backend to UI integration.
+1. **Flask** (`>=2.0.1`): Core web server framework used to handle HTTP requests and define routes.
+2. **Jinja2**: Template engine integrated with Flask to render dynamic HTML content.
+3. **pytest**: Testing framework for writing unit and integration tests.
+
+---
+
+## **Known Challenges**
+
+1. **Cross-Platform Compatibility**:
+   - Addressing file path and line-ending differences across Windows, macOS, and Linux.
+   - Documented in `README.md` with solutions, including `.gitattributes` setup for line ending consistency【379†source】.
+
+2. **Pre-Commit Hook Inconsistencies**:
+   - Ensuring pre-commit hooks for linting and formatting are configured correctly across team environments【382†source】.
+
+3. **Template Rendering Issues**:
+   - Ensuring templates render as expected, with testing on multiple browsers to validate consistent UI【379†source】.
+
+4. **Limited Initial Test Coverage**:
+   - Expansion planned for test cases to include new routes and template scenarios, with a goal of achieving 80% coverage by version `0.0.0.3`【380†source】.
+
+---
+
+## **Future Directions**
+
+1. **v0.0.0.3 - Basic HTML UI Setup**:
+   - Introduce a minimal interactive UI with form fields and basic CSS styling【381†source】.
+
+2. **v0.0.0.4 - Backend-UI Integration**:
+   - Establish an API endpoint for form data submission and display responses on the HTML interface.
+
+3. **Documentation Updates**:
+   - Enhance **user_manual.md** for detailed usage instructions.
+   - Include architecture diagrams and additional endpoint specifications.

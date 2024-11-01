@@ -1,3 +1,7 @@
+Here’s an updated **API Specifications** document based on the enhancements in **v0.0.0.2**:
+
+---
+
 # **API Specifications**
 
 This document outlines the API endpoints for Cortex **v0.0.0.2**, detailing request/response structures, data formats, and error handling. This version introduces the foundational routes with basic response handling for testing the Flask application.

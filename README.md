@@ -2,7 +2,7 @@
 
 ## **Overview**
 
-Cortex is a Flask-based web application that serves as the backend for a larger project. The initial setup includes a minimal Flask application, basic routing, and integration with HTML templates. This version (v0.0.0.2) introduces the foundation of the backend and sets up initial routes and templates.
+Cortex is a locally-hosted chatbot application designed to deliver an advanced, private AI experience. With the addition of **revision v0.0.0.3**, a basic **HTML User Interface (UI)** has been introduced, enabling users to interact with the backend through a simple web form.
 
 ## **Table of Contents**
 1. [Features](#features)
@@ -44,17 +44,37 @@ To get started with Cortex, follow these steps to set up the development environ
    ```
 
 3. **Install Dependencies**:
-   Install the required dependencies listed in `requirements.txt`:
-   ```bash
-   pip install -r requirements.txt
-   ```
+   This project uses the following dependencies:
 
-4. **Install Flask** (if not already installed):
-   ```bash
-   pip install Flask
-   ```
+   - Flask: Handles the web server.
+   - Pytest: For running unit and integration tests.
+   - Markupsafe: For sanitizing user inputs to prevent vulnerabilities like XSS.
+   - JavaScript and CSS: Used for frontend interaction and styling.
+
+   Install the dependencies using the following command:
+   ```sh
+   pip install -r requirements.txt
 
 ---
+
+### Setting Up the Project
+
+1. **Clone the Repository**:
+   ```sh
+   git clone https://github.com/your-repository/cortex
+   cd cortex
+
+2. **Set Up Virtual Environment**:
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+3. **Install Requirements**:
+   pip install -r requirements.txt
+
+4. Running the Application: Start the Flask server to view the HTML User Interface:
+   python src/app/app.py
+
+5. Open your browser and navigate to http://127.0.0.1:5000/ to view and use the form interface.
 
 ## **Running the Application**
 
@@ -80,14 +100,53 @@ Cortex uses `pytest` for unit testing. Tests are written to validate the behavio
    pip install pytest
    ```
 
-2. **Run the Tests**:
-   ```bash
-   pytest tests/
-   ```
+### **Run the Tests**:
+Revision v0.0.0.3 introduces a **basic HTML UI**. Testing has been expanded to cover both backend routes and the new UI functionality:
 
-3. **Test Coverage**:
-   - Routes like `/` and `/health` are tested for expected output.
-   - The application handles both valid and invalid requests, ensuring robustness.
+1. **Unit Tests**:
+   - Flask routes are tested using **pytest**.
+   - Tests can be found in `/tests/test_routes.py`.
+   - Run tests using:
+     ```sh
+     pytest tests/
+     ```
+
+2. **Integration Tests**:
+   - Test the integration between the UI and backend, ensuring that form submissions are properly handled.
+   - Use the test client to simulate form submissions.
+
+3. **Cross-Browser Testing**:
+   - Ensure that the HTML UI works properly across major browsers like Chrome, Firefox, and Safari.
+   - Manual testing should include verifying interactions such as button clicks, form submission, and validation.
+
+4. **Accessibility Testing**:
+   - Tools like **WAVE** or **Lighthouse** are recommended to audit the accessibility of the HTML page.
+   - Ensure that all input elements have ARIA labels and that the page is navigable using only a keyboard.
+
+
+---
+### New Features and Functionalities in v0.0.0.3
+
+**Basic HTML User Interface**:
+- A minimal HTML page (`index.html`) has been added in `/src/app/templates/`. It contains a form that users can fill out and submit to interact with the backend.
+
+**CSS Styling for Basic Responsiveness**:
+- **File Location**: `/src/static/style.css`.
+- Provides basic styling to make the form visually appealing and responsive across devices.
+
+**JavaScript for Form Interactivity**:
+- **File Location**: `/src/static/script.js`.
+- JavaScript has been added to enhance the user experience with features like form validation to ensure inputs are not empty before submission.
+
+Example:
+```javascript
+document.querySelector('form').addEventListener('submit', function(event) {
+    const input = document.querySelector('#userInput').value;
+    if (!input) {
+        alert('Input is required!');
+        event.preventDefault();
+    }
+});
 
 ---
 
@@ -96,15 +155,11 @@ Cortex uses `pytest` for unit testing. Tests are written to validate the behavio
 We welcome contributions to Cortex. Please follow these steps when contributing:
 
 1. **Branching Strategy**:
-   - Create feature branches using the format `feature/<feature-name>`.
-   - Avoid committing directly to `main`.
+   - Follow the `feature/<feature_name>` naming convention for branches.
 
 2. **Code Formatting and Linting**:
-   - Use `pylint` for linting and `black` for code formatting.
-   - Set up pre-commit hooks to automatically run these tools before committing:
-     ```bash
-     pre-commit install
-     ```
+   - Use **pylint** and **black** for Python code.
+   - JavaScript should be linted with **ESLint**.
 
 3. **Testing**:
    - Write unit tests for any new features or bug fixes.
@@ -120,13 +175,13 @@ For more detailed contribution instructions, refer to the **CONTRIBUTING.md**.
 
 ## **Known Issues**
 
-1. **Cross-Platform Compatibility**:
-   - Differences in file handling across operating systems (Windows, Linux, macOS) may cause issues. Be sure to use the correct paths and line endings. The `.gitattributes` file is set up to handle this, but double-check when contributing.
+- **JavaScript Inconsistencies**:
+  JavaScript validation has shown inconsistencies across different browsers, especially in Safari. Consider adding **try-catch** blocks and using feature detection to mitigate these issues.
 
-2. **Incomplete Documentation**:
-   - The documentation (e.g., troubleshooting) is still being expanded. Please report any gaps you find during onboarding or while working on the project.
+- **Platform-Specific Path Handling**:
+  Differences in file paths between operating systems (e.g., Windows vs. Linux/macOS) might cause issues. Ensure you follow the platform-specific instructions in the setup steps.
 
-3. **Pre-Commit Hook Inconsistencies**:
-   - Some users may experience issues with pre-commit hooks not running as expected. Ensure your environment is set up correctly following the instructions in the **CONTRIBUTING.md**.
+- **Accessibility Gaps**:
+  Conduct a thorough audit of form labels and ARIA attributes using tools like **WAVE** to ensure all input elements are accessible.
 
 ---

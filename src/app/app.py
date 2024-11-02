@@ -16,7 +16,9 @@ def health_check():
 @app.route('/submit', methods=['POST'])
 def handle_form_submission():
     user_input = request.form['user_input']
-    # Sanitize input and process it
+    if not user_input:
+        return "Input is required", 400
+    # Sanitizing and processing user input
     return f"Received: {user_input}"
 
 if __name__ == "__main__":

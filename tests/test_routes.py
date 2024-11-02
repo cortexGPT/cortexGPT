@@ -16,13 +16,18 @@ def test_home_route(client):
     Test the home route ('/') to verify it returns a 200 status
     and contains the 'Hello, Cortex!' message in its HTML content.
     """
-    response = client.get("/")
+    response = client.get('/')
     assert response.status_code == 200
 
 def test_submit_route(client):
     response = client.post('/submit', data={'user_input': 'test'})
     assert response.status_code == 200
     assert b'Received: test' in response.data
+    
+    # Edge case - Empty input
+    response_empty = client.post('/submit', data={'user_input': ''})
+    assert response_empty.status_code == 400
+    assert b'Input is required' in response_empty.data
 
 def test_health_check(client):
     """

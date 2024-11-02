@@ -51,10 +51,9 @@ We welcome your contributions to Cortex! To help you get started and ensure a sm
 
 ## **Branching Strategy**
 
-We follow the **feature branching** model to ensure clear, organized code contributions. Here are the main branch types:
-- **Feature Branch**: `feature/<feature-name>` for new features or enhancements.
-- **Hotfix Branch**: `hotfix/<bug-description>` for urgent bug fixes.
-- **Release Branch**: `release/<version-number>` for release preparation.
+- Follow the `feature/<feature_name>` naming convention for all feature development.
+- Create separate branches for bug fixes (`bugfix/<issue_description>`) and documentation updates (`docs/<update_description>`).
+
 
 Always base new branches on the latest `main` branch.
 
@@ -62,20 +61,9 @@ Always base new branches on the latest `main` branch.
 
 ## **Code Standards**
 
-We enforce strict adherence to code standards for maintainability and readability:
-
-1. **Naming Conventions**:
-   - **Variables** and **functions**: Use `snake_case`.
-   - **Classes**: Use `PascalCase`.
-   - **File Names**: Keep file names concise and use `snake_case`.
-
-2. **PEP 8 Compliance**:
-   - Ensure Python code follows PEP 8 standards using `pylint`.
-   - Use `black` for automatic code formatting.
-
-3. **Separation of Concerns**:
-   - Separate Flask routes and business logic.
-   - Keep templates and static files organized in appropriate directories (`/templates`, `/static`).
+- **Python**: Use `pylint` and `black` to enforce linting and formatting. Ensure `black` is run before submitting any pull requests to maintain consistency.
+- **JavaScript**: Use `ESLint` for JavaScript linting. Ensure code follows the modular approach described in the `Design Document` to maintain readability and reusability.
+- **HTML & CSS**: Use semantic HTML5 tags and descriptive class names (`kebab-case`). All form inputs must include ARIA labels to enhance accessibility.
 
 ---
 
@@ -119,10 +107,13 @@ To contribute your work:
    - Ensure the PR description is clear and includes links to any related issues or tasks.
 
 2. **Write Meaningful Commit Messages**:
-   - Format commits using `type: description`. Example:
-     ```bash
-     git commit -m "feat: add health check route"
-     ```
+   - Use the following commit message format:
+   - `feat:` for new features.
+   - `fix:` for bug fixes.
+   - `style:` for formatting, CSS, and appearance changes.
+   - `test:` for adding or modifying tests.
+   - `docs:` for documentation updates.
+   - Example: `feat: add JavaScript form validation for input field`.
 
 3. **Pass All Checks**:
    - Your PR must pass linting, formatting, and testing checks before it can be merged.

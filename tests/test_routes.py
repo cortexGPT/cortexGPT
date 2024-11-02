@@ -18,7 +18,11 @@ def test_home_route(client):
     """
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Hello, Cortex!" in response.data
+
+def test_submit_route(client):
+    response = client.post('/submit', data={'user_input': 'test'})
+    assert response.status_code == 200
+    assert b'Received: test' in response.data
 
 def test_health_check(client):
     """

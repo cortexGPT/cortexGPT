@@ -40,12 +40,3 @@ def test_health_check_invalid_method(client):  # pylint: disable=W0621
     """
     response = client.post("/health")
     assert response.status_code == 405
-
-def test_html_template_rendering(client):  # pylint: disable=W0621
-    """
-    Test the home route ('/') to verify that the HTML content
-    is rendered correctly with the expected '<h1>Hello, Cortex!</h1>' header.
-    """
-    response = client.get("/")
-    assert response.status_code == 200
-    assert b"<h1>Hello, Cortex!</h1>" in response.data

@@ -29,6 +29,20 @@ def test_submit_route(client):
     assert response_empty.status_code == 400
     assert b'Input is required' in response_empty.data
 
+def test_form_submission_integration(client):
+    # Simulate a valid submission
+    response = client.post('/submit', data={'user_input': 'Hello'})
+    assert response.status_code == 200
+    assert b'Received: Hello' in response.data
+
+    # Invalid submission case - Ensure script tags are sanitized
+    response_invalid = client.post('/submit', data={'user_input': '<script>alert(1)</script>'})
+    assert response_invalid.status_code == 200
+    # Ensure proper sanitization to avoid script injection
+    assert b'<script>' not in response_invalid.data  # Ensure raw script tags are not present
+    # Ensure the content is properly escaped
+    assert b'Received: &lt;script&gt;alert(1)&lt;/script&gt;' in response_invalid.data
+
 def test_health_check(client):
     """
     Test the health check route ('/health') to verify it returns

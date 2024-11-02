@@ -2,10 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome to Cortex</title>
+    <title>Cortex Interaction</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Hello, Cortex!</h1>
-    <p>This is the landing page for Cortex v0.0.0.2.</p>
+    <form action="/submit" method="post">
+        <label for="userInput">Enter Input:</label>
+        <input type="text" id="userInput" name="user_input" required>
+        <button type="submit">Submit</button>
+    </form>
+    <script src="/static/script.js"></script>
 </body>
 </html>

@@ -1,132 +1,133 @@
-Here’s an updated **API Specifications** document based on the enhancements in **v0.0.0.2**:
+# API Specifications
+
+## Overview
+
+This document provides a detailed specification for the available endpoints, their input/output formats, request/response structures, and error handling standards used in the Cortex chatbot application.
+
+### Table of Contents
+- `/health`
+- `/submit`
+- HTML UI Interactions
+- Error Handling Standards
+- Input Validation
+
+## Endpoint: `/health`
+
+**Method**: `GET`
+
+**Description**: Returns the current status of the application to indicate if the server is running correctly.
+
+**Response Format**:
+- **Status Code**: `200 OK`
+- **Body**:
+  - `status` (string): Indicates the health of the server.
+
+**Response Example**:
+```json
+{
+  "status": "running"
+}
+```
+
+**Error Handling**:
+- **405 Method Not Allowed**: If a method other than `GET` is used (e.g., `POST`).
+  - **Response Example**:
+    ```json
+    {
+      "error": "Method Not Allowed"
+    }
+    ```
+
+## New Endpoint: `/submit`
+
+**Method**: `POST`
+
+**Description**: This endpoint processes the user's input submitted from the HTML form and returns a response with the sanitized content.
+
+**Request Format**:
+- Content-Type: `application/x-www-form-urlencoded`
+- **Parameters**:
+  - `user_input` (string): The input text provided by the user. This field is required.
+
+**Request Example**:
+```sh
+POST /submit HTTP/1.1
+Host: 127.0.0.1:5000
+Content-Type: application/x-www-form-urlencoded
+
+user_input=Hello%20World
+```
+
+**Response Format**:
+- **Status Code**: `200 OK` (Successful input processing)
+- **Body**:
+  - `message` (string): The processed input message.
+
+**Response Example**:
+```json
+{
+  "message": "Received: Hello World"
+}
+```
+
+**Error Handling**:
+- **400 Bad Request**: Returned when the `user_input` field is missing or empty.
+  - **Response Example**:
+    ```json
+    {
+      "error": "Input is required"
+    }
+    ```
+
+**Notes**:
+- Input is sanitized using Markupsafe's `escape()` to prevent Cross-Site Scripting (XSS) attacks.
+
+## HTML UI Interactions
+
+**Form Submission Endpoint**:
+- The HTML form at `/` sends a `POST` request to the `/submit` endpoint.
+- The form data is submitted as `application/x-www-form-urlencoded` content.
+
+**JavaScript Validation**:
+- Before submission, JavaScript validates the `user_input` to ensure it is not empty.
+- If `user_input` is empty, a client-side alert is triggered, and the request is not sent.
+
+**Error Scenarios**:
+- **Empty Input Field**:
+  - **Client-Side**: JavaScript will prevent the form from being submitted if `user_input` is empty, with an alert message: `"Input is required!"`.
+  - **Server-Side**: If the validation fails at the server level, a `400 Bad Request` response is returned.
+
+## Error Handling Standards
+
+- **400 Bad Request**:
+  - **Context**: Missing or invalid input for required fields.
+  - **Example**:
+    ```json
+    {
+      "error": "Input is required"
+    }
+    ```
+
+- **405 Method Not Allowed**:
+  - **Context**: Incorrect HTTP method used for an endpoint (e.g., using `POST` on `/health`).
+  - **Example**:
+    ```json
+    {
+      "error": "Method Not Allowed"
+    }
+    ```
+
+- **Cross-Site Scripting Prevention**:
+  - All input data is sanitized using Markupsafe's `escape()` to mitigate the risk of XSS attacks. This is especially important for user-provided text, which is then rendered back in the HTML.
+
+## Input Validation
+
+**Client-Side Validation**:
+- Implemented in JavaScript (`/static/script.js`) to ensure required fields are filled before form submission.
+- If validation fails, an alert is displayed, and the submission is prevented.
+
+**Server-Side Validation**:
+- All inputs are validated again upon receiving the request.
+- Empty or invalid `user_input` results in a `400 Bad Request` error.
 
 ---
-
-# **API Specifications**
-
-This document outlines the API endpoints for Cortex **v0.0.0.2**, detailing request/response structures, data formats, and error handling. This version introduces the foundational routes with basic response handling for testing the Flask application.
-
----
-
-## **Table of Contents**
-1. [Overview](#overview)
-2. [Endpoints](#endpoints)
-   - [Root Route `/`](#root-route-)
-   - [Health Check Route `/health`](#health-check-route-health)
-3. [Request and Response Formats](#request-and-response-formats)
-4. [Error Handling](#error-handling)
-5. [Future Additions](#future-additions)
-
----
-
-## **Overview**
-
-The initial version of the Cortex API is designed to:
-1. Provide a basic web page with the root route (`/`).
-2. Offer a health check endpoint (`/health`) to verify server status.
-
-The Flask application processes HTTP GET requests for both routes, utilizing HTML templating for the root and JSON response for health checks.
-
----
-
-## **Endpoints**
-
-### **Root Route `/`**
-
-- **Description**: Serves the home page as an HTML document.
-- **Endpoint**: `/`
-- **HTTP Method**: `GET`
-- **Response**: Renders the `index.html` template, which displays a welcome message.
-- **Example Request**:
-  ```http
-  GET / HTTP/1.1
-  Host: localhost:5000
-  ```
-- **Example Response**:
-  ```html
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <title>Welcome to Cortex</title>
-  </head>
-  <body>
-      <h1>Hello, Cortex!</h1>
-      <p>This is the landing page for Cortex v0.0.0.2.</p>
-  </body>
-  </html>
-  ```
-
-### **Health Check Route `/health`**
-
-- **Description**: Provides server status, confirming the backend is running.
-- **Endpoint**: `/health`
-- **HTTP Method**: `GET`
-- **Response**: JSON response with server status information.
-- **Example Request**:
-  ```http
-  GET /health HTTP/1.1
-  Host: localhost:5000
-  ```
-- **Example Response**:
-  ```json
-  {
-      "status": "running"
-  }
-  ```
-
----
-
-## **Request and Response Formats**
-
-1. **Request Formats**:
-   - Both endpoints accept standard HTTP GET requests.
-   - `/` route returns an HTML document.
-   - `/health` route returns a JSON response.
-   
-2. **Response Formats**:
-   - `/` route renders HTML via Flask’s `render_template()` function.
-   - `/health` route uses Flask’s `jsonify()` to return JSON.
-
----
-
-## **Error Handling**
-
-### **1. Unsupported Methods**
-   - Routes `/` and `/health` only support the `GET` method.
-   - **Error Response**:
-     - **Status Code**: `405 Method Not Allowed`
-     - **Response Body**:
-       ```json
-       {
-           "error": "Method Not Allowed"
-       }
-       ```
-
-### **2. Template Not Found**
-   - If the `index.html` template is missing or misconfigured, the server will respond with an error.
-   - **Error Response**:
-     - **Status Code**: `500 Internal Server Error`
-     - **Response Body** (Default Flask error message):
-       ```html
-       <!DOCTYPE html>
-       <html lang="en">
-       <head>...</head>
-       <body>
-           <h1>Internal Server Error</h1>
-           <p>The server encountered an internal error and could not complete your request.</p>
-       </body>
-       </html>
-       ```
-
-### **3. General Error Handling**
-   - All unhandled errors will return a `500 Internal Server Error` status code, indicating that an internal issue has occurred.
-
----
-
-## **Future Additions**
-
-Future versions will introduce:
-1. **Input Validation**: Validation rules for new routes and forms to ensure data integrity.
-2. **Authentication**: Secure access for restricted endpoints.
-3. **Error Page Customization**: Define custom templates for error codes (404, 500) to improve user experience.

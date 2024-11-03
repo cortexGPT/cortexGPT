@@ -2,17 +2,28 @@
 
 ## **Overview**
 
-This document provides a technical overview of Cortex, including architectural details, module descriptions, endpoint specifications, error handling, and dependencies. Cortex is a web application built on Flask that serves as a foundational backend and front-end interface for further development.
+This document provides a technical overview of Cortex, including architectural details, module descriptions, endpoint specifications, error handling, and dependencies. Cortex is an advanced, locally-hosted chatbot designed to provide a rich offline user experience. As of **revision v0.0.0.3**, a basic **HTML User Interface (UI)** has been implemented to allow users to interact with the chatbot via a simple form.
 
 ---
 
 ## **Architecture**
 
 ### **System Architecture**
-Cortex’s architecture consists of a lightweight Flask backend, basic HTML front-end, and modular components for future scalability:
-- **Flask Backend**: Manages routing, HTTP handling, and API endpoint definitions.
-- **HTML Frontend**: Provides a simple, Jinja2-rendered HTML page as the user interface.
-- **Testing Framework**: Uses `pytest` for unit and integration testing of all routes and template rendering.
+
+**Frontend (HTML, CSS, JavaScript)**:
+- **HTML**: Located in `/src/app/templates/`, this component serves as the user interface for interacting with the backend.
+- **CSS**: The style sheet (`style.css`) is located in `/src/static/` and ensures the form is responsive and visually appealing.
+- **JavaScript**: Enhances interactivity by providing client-side validation (`script.js` in `/src/static/`).
+
+**Backend (Flask)**:
+- **Flask Application**: Located in `/src/app/app.py`, responsible for routing requests from the HTML frontend and providing appropriate responses.
+- **Interaction Flow**:
+  - **User Request**: A form submission from the HTML page is sent to the `/submit` route.
+  - **Backend Processing**: Flask handles the request, sanitizes the input, and returns a response.
+  - **Response Flow**: The response is rendered back on the page for the user to see.
+
+The interaction between the frontend and backend follows a traditional request-response model using HTTP POST.
+
 
 ### **File Structure**
 The Cortex file structure follows best practices for separation of concerns:
@@ -39,39 +50,13 @@ cortexGPT/
 
 ## **Modules and Components**
 
-### **1. Flask Application**
-- **Primary File**: `app.py` located in `/src/app/`
-- **Purpose**: Serves as the main application script for the Flask web server. Defines endpoints, serves the front-end template, and handles JSON responses.
-- **Interdependencies**:
-  - **HTML Templates**: Uses Jinja2 to render HTML for the `/` route.
-  - **Unit Tests**: Validated via `pytest` tests in `/tests/test_routes.py`.
-- **Key Functions**:
-  - **`home()`**: Renders the landing page template.
-  - **`health_check()`**: Returns a JSON object indicating server status.
+**Frontend Modules**:
+- **`/src/app/templates/index.html`**: The HTML page that serves as the main UI. Contains a form for submitting user input.
+- **`/src/static/style.css`**: Provides basic styling, ensuring consistency across different devices.
+- **`/src/static/script.js`**: Implements JavaScript to validate form inputs before submission.
 
-### **2. Templates**
-- **Location**: `/src/templates/`
-- **Main Template**: `index.html`
-- **Purpose**: Provides the static content served by the root endpoint.
-- **Interdependencies**: Served by Flask’s `render_template` function within the `home()` route.
-- **Standards**:
-  - Structured using semantic HTML.
-  - Follows responsive design principles for cross-browser compatibility.
-
-### **3. Testing**
-- **Primary Directory**: `/tests/`
-- **Purpose**: Ensures that each route and endpoint behaves as expected.
-- **Framework**: `pytest` is used for automated testing.
-- **Key Tests**:
-  - **Home Route Test**: Confirms the HTML page is rendered successfully.
-  - **Health Check Route Test**: Validates JSON response for server status.
-- **Code Example**:
-  ```python
-  def test_home_route(client):
-      response = client.get('/')
-      assert response.status_code == 200
-      assert b"Hello, Cortex!" in response.data
-  ```
+**Backend Modules**:
+- **`/src/app/app.py`**: Flask application that processes form submissions and routes them to appropriate backend logic.
 
 ---
 
@@ -80,7 +65,7 @@ cortexGPT/
 ### **Application Request Flow**
 
 ```plaintext
-[User Request]
+[User Interaction]
        |
        v
 [Flask Server]
@@ -96,13 +81,36 @@ cortexGPT/
        +--> [JSON Response (health_check)]
        |
        v
- [Response to User]
+ [User Feedback]
 ```
 
 ### **File and Module Interaction Flow**
 - **Flask App** -> `render_template()` -> **HTML Template (`index.html`)**
 - **Flask App** -> `jsonify()` -> **JSON Response (`{"status": "running"}`)**
 - **Unit Tests** -> Flask Endpoints -> **Routes (`/`, `/health`)**
+
+---
+
+## **Third-Party Dependencies**
+
+1. **Flask**: Provides the backend infrastructure to handle new form routes (`/submit`).
+2. **Jinja2**: Template engine integrated with Flask to render dynamic HTML content.
+3. **Markupsafe**: Used to sanitize user inputs on the backend to prevent XSS.
+4. **pytest**: Testing framework for writing unit and integration tests.
+
+---
+
+### HTML User Interface (UI) Details
+
+**Form Integration**:
+- The new form in `index.html` allows users to input data, which is then submitted to the backend using a POST request.
+- **Client-Side JavaScript** ensures that empty input fields are not submitted, providing real-time validation to improve user experience.
+
+**CSS Styling**:
+- The `style.css` file makes the form responsive and visually consistent across different devices and browsers.
+
+**JavaScript for Form Validation**:
+- The script (`script.js`) handles basic validation to ensure user input is present before allowing form submission.
 
 ---
 
@@ -122,6 +130,12 @@ For detailed request/response structures and error handling, refer to **api_spec
 ### **Error Scenarios**
 1. **Missing Template**: Returns a `500` error if the `index.html` file is missing.
 2. **Unsupported HTTP Methods**: Returns `405` if a non-`GET` request is sent to the `/` or `/health` endpoints.
+3. **Invalid Form Submission**: The `/submit` endpoint now returns a `400 Bad Request` if the `user_input` field is missing or empty.
+  - **Client-Side**: Alerts users when required input is missing.
+  - **Server-Side**: Validates form submission and returns appropriate error messages.
+4. **HTTP Method Handling**:
+- Added error handling for unsupported HTTP methods at key endpoints, such as `/health`.
+- Custom 405 messages are returned to improve clarity.
 
 ### **Error Codes and Responses**
 | Status Code | Scenario                       | Response               |
@@ -132,14 +146,6 @@ For detailed request/response structures and error handling, refer to **api_spec
 ### **Logging and Debugging**
 - **Debug Mode**: Enabled by default in development, providing error tracebacks.
 - **Production**: Disable debug mode and configure error handling for production deployment.
-
----
-
-## **Third-Party Dependencies**
-
-1. **Flask** (`>=2.0.1`): Core web server framework used to handle HTTP requests and define routes.
-2. **Jinja2**: Template engine integrated with Flask to render dynamic HTML content.
-3. **pytest**: Testing framework for writing unit and integration tests.
 
 ---
 
@@ -171,3 +177,12 @@ For detailed request/response structures and error handling, refer to **api_spec
 3. **Documentation Updates**:
    - Enhance **user_manual.md** for detailed usage instructions.
    - Include architecture diagrams and additional endpoint specifications.
+
+
+
+### Error Handling Improvements
+
+**New Error Scenarios**:
+
+
+

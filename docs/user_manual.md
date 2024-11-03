@@ -15,7 +15,7 @@
 
 ## **1. Introduction**
 
-Cortex is a locally-hosted chatbot framework designed for sophisticated interactions, natural language understanding (NLU), and task management. In this version, **v0.0.0.2**, the focus is on implementing a basic Flask application, establishing foundational routes, and creating a simple HTML landing page.
+Cortex is a locally-hosted chatbot framework designed for sophisticated interactions, natural language understanding (NLU), and task management. Cortex now features a **basic HTML User Interface** that allows users to interact directly with the backend. The UI provides a simple form where users can input their queries, submit them to the backend, and receive a response—all from their web browser.
 
 ---
 
@@ -51,18 +51,31 @@ pip install -r requirements.txt
 
 To run the application in this version:
 
-1. **Navigate to the Source Directory**:
+1. **Run the Application**:
    ```bash
-   cd src/app
+   python src/app/app.py
    ```
 
-2. **Run the Application**:
-   ```bash
-   python app.py
-   ```
-   - **Access the Application**:
-     - **Landing Page**: [http://localhost:5000](http://localhost:5000)
-     - **Health Check Endpoint**: [http://localhost:5000/health](http://localhost:5000/health)
+---
+
+## **5. UI Functionality**
+### Using the HTML User Interface
+
+1. **Accessing the Interface**:
+   - Open your browser and navigate to **http://127.0.0.1:5000/**.
+   - The page will display a simple form labeled **"Enter Input:"**.
+
+2. **Submitting a Form**:
+   - Enter your query or message in the input box.
+   - Click the **Submit** button to send the data to the backend.
+   - Once submitted, the server processes your input and returns a response that will be displayed on the page.
+
+3. **Form Validation**:
+   - If the input field is empty, JavaScript will prevent the form from being submitted and show an alert saying, **"Input is required!"**.
+
+4. **Example Scenario**:
+   - Enter "Hello World" and click submit.
+   - You should receive a response: **"Received: Hello World"**.
 
 ### **Project Structure**
 Key additions in **v0.0.0.2**:
@@ -89,15 +102,22 @@ In this version, two routes are defined for basic functionality:
 
 ---
 
-## **6. Troubleshooting**
+## **6. Troubleshooting and FAQ**
 
-### **Issue 1: Flask Route Error**
-- **Symptom**: `TemplateNotFound` error when accessing `/`.
-- **Solution**: Ensure `index.html` is present in the `/templates` folder.
+**Q1: The server is not starting or cannot be accessed at http://127.0.0.1:5000/**  
+- **Solution**: Ensure the virtual environment is activated before running the server.
+- Check if another application is using port **5000** and stop it or use a different port by running:
+  ```sh
+  python src/app/app.py --port 5001
 
----
+**Q2: Form submission is not working, and nothing happens when I click Submit**
+- **Solution:** Make sure JavaScript is enabled in your browser. Also, ensure you are entering text in the input box before clicking Submit.
 
-## **7. FAQ**
+**Q3: I see "Input is required!" even after entering text**
+- **Solution:** This might be a cross-browser compatibility issue. Try using Chrome or Firefox. Ensure that the latest version of JavaScript is enabled.
 
-**Q1: What’s new in v0.0.0.2?**
-   - A basic Flask backend and HTML template for the landing page.
+**Q4: Changes to index.html or script.js are not reflected**
+- **Solution:** Clear your browser cache or use Ctrl + F5 to force-refresh the page.
+
+**Q5: How do I stop the server?**
+- **Solution:** Use Ctrl + C in the terminal where the server is running to shut it down.

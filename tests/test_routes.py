@@ -1,3 +1,12 @@
+"""
+Unit tests for the Flask application routes in `app.py`.
+
+This module includes:
+- Testing the home route (`/`)
+- Testing the `/submit` endpoint with various cases
+- Testing the `/health` endpoint
+"""
+
 import pytest
 from src.app.app import app
 
@@ -8,7 +17,6 @@ def client():
     Pytest fixture to configure the test client for the Flask app.
     Sets the app to testing mode and yields the client instance.
     """
-    app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
 
@@ -23,6 +31,11 @@ def test_home_route(client):
 
 
 def test_submit_route(client):
+    """
+    Test the `/submit` route with valid and invalid inputs.
+    - Valid case: Ensure proper handling and response.
+    - Invalid case: Test empty input to ensure a 400 status.
+    """
     response = client.post("/submit", data={"user_input": "test"})
     assert response.status_code == 200
     assert b"Received: test" in response.data
@@ -34,6 +47,7 @@ def test_submit_route(client):
 
 
 def test_form_submission_integration(client):
+
     # Simulate a valid submission
     response = client.post("/submit", data={"user_input": "Hello"})
     assert response.status_code == 200
